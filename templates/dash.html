@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+<style>
+    .opts {
+        margin: 2rem 2rem;
+    }
+
+    .patchip {
+        border: .1rem solid black;
+        border-radius: 1rem;
+        width: 16rem;
+        height: 8rem;
+        display: flex;
+        align-items: center;
+        margin: auto;
+    }
+</style>
+{% endblock %}
+{% block title %}Dashboard{% endblock title %}
+{% block content %}
+<div class="maincont" style="width: 85%; overflow-y: auto;">
+    <div class="opts" style="display: flex; flex-direction: row; justify-content: space-between;">
+        <div class="patchip">
+            <img src="https://www.adaptivewfs.com/wp-content/uploads/2020/07/logo-placeholder-image.png" alt="logo"
+                style="height: 3rem;">
+            <div>
+                <p>total patients</p>
+                <p>{{count}}</p>
+            </div>
+        </div>
+        <div class="patchip">
+            <img src="https://www.adaptivewfs.com/wp-content/uploads/2020/07/logo-placeholder-image.png" alt="logo"
+                style="height: 3rem;">
+            <div>
+                <p>CRIT patients</p>
+                <p>{{critcount}}</p>
+            </div>
+        </div>
+    </div>
+    <div class="opts">
+        <div class="botopts" style="border: .1rem solid black; width: auto; min-height: 30rem;">
+            <h2>newest update</h2>
+            {% if newestpat %}
+            <h5>Name: {{newestpat.full_name}}</h5>
+            <h5>Updated On: {{newestpat.newest_update}}</h5>
+            
+            <button><a href="//{{phone}}" target="_blank">Contact</a></button>
+            
+            <div class="graph">
+                <div id="graph1" style="overflow-x: auto; overflow-y: auto;"></div>
+            </div>
+            {% else %}
+            <p style="margin: 12rem auto; text-align: center;">No New Updates</p>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block script %}
+<script>
+    /* eslint-disable no-undef */
+    const ekg_volt = {{ ekgvolt | safe}};
+    const ekg_times = {{ ekgtimes | safe}};
+
+
+    var trace1 = {
+        x: ekg_times,
+        y: ekg_volt,
+        type: 'scatter'
+    };
+
+    const ekgLayout = {
+        title: 'EKG Data',
+        xaxis: { title: 'Measurement Index' },
+        yaxis: { title: 'Voltage (mV)' }
+    };
+
+    var data = [trace1];
+
+    Plotly.newPlot('graph1', data, ekgLayout);
+</script>
+{% endblock %}

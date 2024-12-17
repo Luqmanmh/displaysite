@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+{% endblock %}
+{% block title %}dumassinput{% endblock title %}
+{% block content %}
+    
+<div class="popform" id="fileform">
+    <form action="/dummyup/" method="POST" class="form-container" enctype="multipart/form-data" style="text-align: center;">
+        {% csrf_token %}
+        <br>
+        <label for="username">patid</label>
+        <input type="text" id="username" name="username">
+        <br> <br>
+        {{ form.file }}
+        <br><br>
+        <input type="submit">
+    </form>
+    
+</div>
+{% endblock content %}

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+<style>
+    .top {
+        display: flex;
+        justify-content: space-between;
+    }
+</style>
+{% endblock %}
+{% block title %}patients detail{% endblock title %}
+{% block content %}
+<div class="opts" style="width: 100%;">
+    <div class="botopts" style="width: auto; min-height: 30rem; width: 95%; margin: 2rem auto;">
+        <div class="top">
+            <div class="topleft";">
+                <h2>Patients Detail</h2>
+                <h5>Name: {{patient.full_name}}</h5>
+                <h5>Updated On: {{patient.newest_update}}</h5>
+                <button><a href="//{{phone}}" target="_blank">Contact</a></button>
+            </div>
+            <div class="topright" style="color: maroon; text-align: center; margin: 1rem auto;">
+            {% if patient.critical_con == 1 %}
+            <h2><i class="fa-solid fa-triangle-exclamation"></i></h2>
+            <p>Critical</p>
+            {% endif %}    
+            </div>
+            
+        </div>
+        <div class="graph">
+            <div id="graph1" style="overflow-x: auto; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+</div>
+{% endblock content %}
+
+{% block script %}
+<script>
+    /* eslint-disable no-undef */
+    const ekg_volt = {{ ekgvolt | safe}};
+    const ekg_times = {{ ekgtimes | safe}};
+
+
+    var trace1 = {
+        x: ekg_times,
+        y: ekg_volt,
+        type: 'scatter'
+    };
+
+    const ekgLayout = {
+        title: 'EKG Data',
+        xaxis: { title: 'Measurement Index' },
+        yaxis: { title: 'Voltage (mV)' }
+    };
+
+    var data = [trace1];
+
+    Plotly.newPlot('graph1', data, ekgLayout);
+</script>
+{% endblock %}
