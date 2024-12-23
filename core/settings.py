@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-pw5!8rdni6ouw79s^6l^vs$9&0pw%26k+-e9_2+ab4c3-8^@n!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework'
+    'rest_framework',
+    'storages'
 ]
 
 MIDDLEWARE = [
@@ -76,13 +77,24 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'docproj',
+#         'USER': 'postgres',
+#         'PASSWORD': 'qwertyui',
+#         'HOST': 'localhost',
+#         'PORT': '5432'
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'docproj',
-        'USER': 'postgres',
-        'PASSWORD': 'qwertyui',
-        'HOST': 'localhost',
+        'USER': 'melnn',
+        'PASSWORD': 'piWppQ3maifMtCm',
+        'HOST': 'database-1.czuc0ui089yg.ap-southeast-1.rds.amazonaws.com',
         'PORT': '5432'
     }
 }
@@ -122,15 +134,29 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+# local
+# STATIC_URL = 'static/'
+# STATICFILES_DIRS = [
+#     BASE_DIR / "static",
+# ]
 
-#Media Input
+# #Media files local
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_URL = 'media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+STORAGES = {
+    
+    # media
+    "default" : {
+        "BACKEND" : "storages.backends.s3boto3.S3StaticStorage", 
+    },
+    
+    # static
+    "staticfiles" : {
+        "BACKEND" : "storages.backends.s3boto3.S3StaticStorage", 
+    },   
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -145,4 +171,9 @@ SESSION_COOKIE_AGE = 3600 * 3  # Session expires in 1*3 hour (seconds)
 SESSION_COOKIE_SECURE = True  # Use HTTPS for session cookies
 SESSION_SAVE_EVERY_REQUEST = True  # Save session data on every request
 
+AWS_ACCESS_KEY_ID = 'AKIATQZCSDJ22JMOSMHY'
+AWS_SECRET_ACCESS_KEY = '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'
 
+AWS_STORAGE_BUCKET_NAME = 'docprojbucket'
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+AWS_S3_FILE_OVERWRITE = False

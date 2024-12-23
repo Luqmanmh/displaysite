@@ -33,7 +33,7 @@ def register(request):
                     user = User.objects.create_user(username=username, email=email, first_name=full_name, password=password)
                     messages.info(request, 'Register Successfull')
                     user.save()
-                    return redirect('loginusr')
+                    return redirect('dash')
             else:
                 messages.info(request, 'Password does not match')
                 return redirect('register')  
@@ -55,14 +55,14 @@ def loginusr(request):
     return render(request, 'login.html')
 
 # logout
-@login_required(login_url='login')
+@login_required(login_url='loginusr')
 def logoutusr(request):
     logout(request)
     messages.success(request, ("You Were Logged Out!"))
     return redirect('loginusr')
 
 # dashboard
-@login_required(login_url='login')
+@login_required(login_url='loginusr')
 def dash(request):
     user_id = request.user.id
     
@@ -100,7 +100,7 @@ def dash(request):
     return render(request, 'dash.html', htmlpass)
 
 #patient tab
-@login_required(login_url='login')
+@login_required(login_url='loginusr')
 def patienttab(request):
     user_id = request.user.id
     
@@ -112,7 +112,7 @@ def patienttab(request):
     
     return render(request, 'patientstab.html', htmlpass)
 
-@login_required(login_url='login')
+@login_required(login_url='loginusr')
 def search_patient(request):
     user_id = request.user.id
     quest = request.GET.get('quest', '')
@@ -127,7 +127,7 @@ def search_patient(request):
     return render(request, 'patientstab.html', htmlpass)
 
 # add patients function for patients tab
-@login_required(login_url='login')
+@login_required(login_url='loginusr')
 def addpatient(request):
     user = request.user
     
@@ -140,7 +140,7 @@ def addpatient(request):
     return redirect('patientstab')
 
 # patients detail page
-@login_required(login_url='login')
+@login_required(login_url='loginusr')
 def patientsdet(request, patid):
     user_id = request.user.id
     
@@ -178,7 +178,7 @@ def blink(request):
 # -------------------------------------------------------------------------------
 # 4 development
 
-@login_required(login_url='login')
+@login_required(login_url='loginusr')
 # dummy file up
 def fileup(request):
     if request.method == "POST":
