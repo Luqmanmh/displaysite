@@ -171,8 +171,8 @@ SESSION_COOKIE_AGE = 3600 * 3  # Session expires in 1*3 hour (seconds)
 SESSION_COOKIE_SECURE = True  # Use HTTPS for session cookies
 SESSION_SAVE_EVERY_REQUEST = True  # Save session data on every request
 
-AWS_ACCESS_KEY_ID = 'AKIATQZCSDJ22JMOSMHY'
-AWS_SECRET_ACCESS_KEY = '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'
+AWS_ACCESS_KEY_ID = ''
+AWS_SECRET_ACCESS_KEY = ''
 
 AWS_STORAGE_BUCKET_NAME = 'docprojbucket'
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
