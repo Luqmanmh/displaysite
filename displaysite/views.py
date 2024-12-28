@@ -18,6 +18,12 @@ def register(request):
         password = request.POST.get('cpass1')
         confirm_password = request.POST.get('cpass2')
         
+        context = {
+            'username': username,
+            'full_name': full_name,
+            'email': email,
+        }
+        
         if not all([username, email, password, confirm_password]):
             messages.info(request, 'Please Fill All FIeld')
             return redirect('register')
@@ -25,20 +31,31 @@ def register(request):
             if password==confirm_password:
                 if User.objects.filter(username=username).exists():
                     messages.info(request, 'Username Taken')
-                    return redirect('register')
+                    return render(request, 'register.html', context)
                 elif User.objects.filter(email=email).exists():
                     messages.info(request, 'Email Taken')
-                    return redirect('register')
+                    return render(request, 'register.html', context)
                 else:
                     user = User.objects.create_user(username=username, email=email, first_name=full_name, password=password)
-                    messages.info(request, 'Register Successfull')
                     user.save()
-                    return redirect('dash')
+                    user = authenticate(request, username=username, password=password)
+                    messages.info(request, 'Register Successfull')
+                    login(request, user)
+                    redirect('dashboard')
             else:
                 messages.info(request, 'Password does not match')
-                return redirect('register')  
+                return render(request, 'register.html', context)  
     else:
-        return render(request, 'register.html')
+        username = ''
+        full_name = ''
+        email = ''
+        
+        context = {
+            'username': username,
+            'full_name': full_name,
+            'email': email,
+        }
+        return render(request, 'register.html', context)
 
 # login for users
 def loginusr(request):
@@ -162,18 +179,37 @@ def patientsdet(request, patid):
         "ekgvolt" : ekgvolt,
         "ekgtimes" : custrange,
         "phone" : phonelink,
-        "patient" : passpat
+        "patient" : passpat,
+        "patid": patid
     }
     
     return render(request, 'patientdetail.html', htmlpass)
-    
 
+def deletepat(request, patid):
     
+    passpat = Patient.objects.get(pk = patid)
+    
+    passpat.delete()
+    
+    return redirect('patientstab')
 
+def editpatient(request, patid):
+    patname = request.POST['patname']
+    patnum = request.POST['patnum']
+    
+    passpat = Patient.objects.get(pk = patid)
+    
+    passpat.full_name = patname
+    passpat.phone_num = patnum
+    
+    passpat.save()
+    
+    return redirect('patientsdet', patid=patid)
 
 # blink | just so i dont need to set '' as dash's link | one of my petpeeves
 def blink(request):
     return redirect('dashboard')
+
 
 # -------------------------------------------------------------------------------
 # 4 development

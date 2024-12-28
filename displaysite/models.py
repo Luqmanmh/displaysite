@@ -11,7 +11,7 @@ class Patient(models.Model):
     
 class patientdata(models.Model):
     jsondata = models.FileField()
-    pat_owner = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    pat_owner = models.ForeignKey(Patient, on_delete=models.CASCADE, null=False)
     up_date = models.DateTimeField(default=datetime.now, blank=True)
     
 class Alert(models.Model):

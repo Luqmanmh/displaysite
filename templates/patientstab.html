@@ -2,20 +2,14 @@
 {% load static %}
 {% block css %}
 <style>
-    .overlay {
-        display: none;
+    th,
+    td {
+        width: 10%;
+        height: 3rem;
     }
 
-    .overlayactive {
-        position: fixed;
-        display: block;
-        left: 0%;
-        top: 0%;
-        width: 100%;
-        height: 100%;
-        background-color: black;
-        opacity: 30%;
-        z-index: 2;
+    #search {
+        border: none;
     }
 
     .popform {
@@ -25,7 +19,7 @@
         left: 50%;
         transform: translate(-50%, -50%);
         border: 3px solid #f1f1f1;
-        z-index: 3;
+        z-index: 6;
         text-align: center;
         border-radius: 1rem;
         padding: 2rem;
@@ -34,6 +28,10 @@
 
     .popform.active {
         display: block;
+    }
+
+    .pats {
+        background-color: rgb(94 234 212);
     }
 
     .btn_cancel {
@@ -47,58 +45,70 @@
 {% endblock %}
 {% block title %}Patients List{% endblock title %}
 {% block content %}
-<div class="maincont" style="width: 85%; margin: 2rem 2rem;">
-    <div class="topper" style="display: flex;">
-        <div class="folderin">
-            <button type="button" class="open-filein" data-target="#patientform">+ Add Patients</button>
+<div class="maincont mx-8">
+    <div class="mt-24">
+        <div class="topper md:flex">
+            <div class="folderin">
+                <button type="button"
+                    class="open-filein hover:bg-white hover:!text-teal-500 bg-teal-500 py-1 px-2 rounded-md text-white font-semibold"
+                    data-target="#patientform">+ Add Patients</button>
 
-            <div class="popform" id="patientform">
-                <div class="btn_cancel">
-                    <button type="button" class="btn_cancel" data-target="#patientform">X</button>
+                <div class="popform" id="patientform">
+                    <div class="btn_cancel">
+                        <button type="button" class="btn_cancel" data-target="#patientform">X</button>
+                    </div>
+                    <form action="{% url 'addpatient' %}" method="POST" class="form-container"
+                        enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <label for="patname">Patient Name:</label>
+                        <input type="text" name="patname" id="patname">
+                        <br><br>
+                        <label for="patnum">Patient Number:</label>
+                        <input type="number" name="patnum" id="patnum">
+                        <br><br>
+                        <input type="submit">
+
+                    </form>
                 </div>
-                <form action="{% url 'addpatient' %}" method="POST" class="form-container"
-                    enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <label for="patname">Patient Name:</label>
-                    <input type="text" name="patname" id="patname">
-                    <br><br>
-                    <label for="patnum">Patient Number:</label>
-                    <input type="number" name="patnum" id="patnum">
-                    <br><br>
-                    <input type="submit">
-
+            </div>
+            <br>
+            <div class="search rounded-xl border-gray-800 border h-12 text-sm shadow-sm flex items-center"
+                style="margin: 0 auto;">
+                <form method="GET" action="{% url 'searchpat' %}" class="sm:w-[4rem] md:w-[24rem] mx-auto">
+                    {% if query %}
+                    <input type="text" id="search" name="quest" value="{{query}}" class="md:w-[22rem] w-12 h-8 ">
+                    {% else %}
+                    <input type="text" id="search" name="quest" value="{{query}}" class="md:w-[22rem] w-26 h-8" placeholder="Search Patients">
+                    {% endif %}
+                    <button class="spy" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
                 </form>
             </div>
+
         </div>
+        <br>
+        <div class="opts overflow-x-auto shadow-md rounded-md block">
+            <table class="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
+                <thead class="ltr:text-left rtl:text-right">
+                    <tr>
+                        <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Name</th>
+                        <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Patient's ID</th>
+                        <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Last Updated</th>
+                    </tr>
+                </thead>
 
-        <div class="search" style="margin: 0 auto;">
-            <form method="GET" action="{% url 'searchpat' %}">
-                {% if query %}
-                <input type="text" id="search" name="quest" value="{{query}}">
-                <button class="spy" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
-                {% else %}
-                <input type="text" id="search" name="quest" value="{{query}}" placeholder="Search Patients">
-                <button class="spy" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
-                {% endif %}
-
-            </form>
+                <tbody class="divide-y divide-gray-200">
+                    {% for i in patients%}
+                    <tr class="odd:bg-gray-100 hover:cursor-pointer"
+                        onclick="window.location='/patients-detail/{{i.id}}'">
+                        <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{{i.full_name}}</td>
+                        <td class="whitespace-nowrap px-4 py-2 text-gray-700">{{i.id}}</td>
+                        <td class="whitespace-nowrap px-4 py-2 text-gray-700">{{i.newest_update}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-
     </div>
-
-    <table style="border: .1rem solid black; border-collapse: collapse; margin: 2rem 0 0 0; text-align: center;">
-        {% for i in patients%}
-        <tr onclick="window.location='/patients-detail/{{i.id}}'">
-            <td style="width: 1%;">{{forloop.counter}}</td>
-            <td style="text-align: left;">
-                {{i.full_name}}
-                <br>
-                id: {{i.id}}
-            </td>
-            <td>{{i.newest_update}}</td>
-        </tr>
-        {% endfor %}
-    </table>
 </div>
 {% endblock content %}
 

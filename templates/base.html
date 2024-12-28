@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+{% load static tailwind_tags %}
 
 <head>
     <meta charset="utf-8">
@@ -10,6 +11,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
     <script src="https://kit.fontawesome.com/c75057c9b4.js" crossorigin="anonymous"></script>
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+    {% tailwind_css %}
     <style>
         * {
             margin: 0;
@@ -31,15 +33,24 @@
             color: black;
         }
 
-        th,
-        td {
-            width: 10%;
-            border: .1rem solid black;
-            height: 3rem;
-        }
-
         td a {
             display: block;
+        }
+
+        .overlay {
+            display: none;
+        }
+
+        .overlayactive {
+            position: fixed;
+            display: block;
+            left: 0%;
+            top: 0%;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            opacity: 30%;
+            z-index: 5;
         }
     </style>
     {% block css %}
@@ -50,7 +61,7 @@
     {% if messages %}
     {% for message in messages %}
     <div style="width: 100%;">
-        <div class="alert alert-warning alert-dismissible fade show" role="alert"
+        <div class="alert alert-warning alert-dismissible fade show bg-teal-500 text-black border-teal-500" role="alert"
             style="z-index: 10; position: fixed; width: 60%; left: 20%">
             {{ message }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -59,41 +70,71 @@
     {% endfor %}
     {% endif %}
 
-    <nav style="border: .1rem solid black; display: flex;height: 8% ;flex-direction: row; justify-content: space-between;align-content: center;">
-        <img src="https://www.adaptivewfs.com/wp-content/uploads/2020/07/logo-placeholder-image.png" alt="logo" style="height: 3rem;">
+    <div id="overlay" class="overlay"></div>
 
-        {% if user.is_authenticated %}
-        <div class="usr" style="display: flex; align-items: center; text-align: right;">
-            <p style="margin-right: .7rem;">{{ user.username }}</p>
-            <img src="https://www.adaptivewfs.com/wp-content/uploads/2020/07/logo-placeholder-image.png" alt="logo"
-                style="height: 3rem;">
-
-            <div class="logoutbut">
-                
-                <div class="logged">
-
-                    <a href="{% url 'logoutusr' %}" style="margin-right: 2rem;"><i class="fa-solid fa-right-from-bracket"></i></a>
+    <div class="flex">
+        <div
+            class="navleft flex h-screen flex-col justify-between border-e bg-teal-500 w-[8rem] md:!w-64 sm:!w-[12rem] z-10">
+            <div class="px-3 py-6">
+                <div class="h-12 rounded-lg text-3xl capitalize text-black ml-3 -mt-1">
+                    <i class="fa-solid fa-heart-pulse"></i>
                 </div>
-        {% else %}
 
-        {% endif %}
+                <ul class="mt-6 space-y-2 text-center font-semibold">
+                    <li>
+                        <a href="{% url 'dashboard' %}"
+                            class="dash block rounded-lg px-4 py-2 md:text-2xl sm:text-lg font-large text-black hover:bg-teal-200">
+                            Dashboard
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'patientstab' %}"
+                            class="pats block rounded-lg px-4 py-2 md:text-2xl sm:text-lg font-large text-black hover:bg-teal-200">
+                            Patients
+                        </a>
+                    </li>
+                </ul>
             </div>
         </div>
 
-    </nav>
+        <div class="gright w-screen bg-white scroll-smooth h-screen overflow-hidden">
+            <header class="bg-white absolute inset-x-0 top-0 border-b-2 border-l shadow-md">
+                <div class="flex h-[4rem] items-center justify-between">
+                    <div class="flex-1 md:flex md:items-center md:gap-12"></div>
+                    <div class="mx-auto px-4 sm:px-6 lg:px-8">
+                        <div class="flex h-16 items-center justify-between">
+                            <div class="flex items-center mr-2  text-gray-800">
+                                <div class="hidden sm:flex align">
+                                    <div class="rounded-l-lg bg-gray-100 px-5 py-2 text-md font-medium">
+                                        {{ user.username }}
+                                    </div>
+                                </div>
+                                <div class="sm:flex sm:gap-4 group relative">
+                                    <div
+                                        class="absolute left-0 top-full mt-0.5 p-2 bg-gray-200 text-sm -z-20 transition-all duration-300 group-hover:z-0 rounded-md">
+                                        logout
+                                    </div>
+                                    <a href="{% url 'logoutusr' %}">
+                                        <div
+                                            class="rounded-r-lg bg-gray-100 pl-2 pr-2 py-2.5 text-sm font-medium hover:bg-red-500 hover:text-white">
+                                            <i class="fa-solid fa-right-from-bracket"></i>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <div class="cont block mx-auto mt-[4rem] h-[calc(100%-4rem)] scroll-smooth ">
+                {% block content %}
 
-    <div id="overlay" class="overlay"></div>
 
-    <div class="main" style="display: flex; height: 92%;">
-        <div class="navleft" style="border: .1rem solid black; min-width: 15%;">
-            <h2><a href="{% url 'dashboard' %}">Dashboard</a></h2>
-            <h2><a href="{% url 'patientstab' %}">Patients</a></h2>
+
+                {% endblock content %}
+            </div>
         </div>
-        {% block content %}
-
-
-
-        {% endblock content %}
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous">

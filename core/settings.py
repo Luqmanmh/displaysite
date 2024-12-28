@@ -26,7 +26,8 @@ SECRET_KEY = 'django-insecure-pw5!8rdni6ouw79s^6l^vs$9&0pw%26k+-e9_2+ab4c3-8^@n!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['13.213.52.70']
+# ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -40,8 +41,19 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'storages'
+    'storages',
+    'django_cleanup',
+    'tailwind',
+    'theme',
+    # 'django_browser_reload'
 ]
+
+TAILWIND_APP_NAME = 'theme'
+INTERNAL_IPS = [
+    "127.0.0.1",
+    "13.213.52.70"
+]
+NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -51,6 +63,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # "django_browser_reload.middleware.BrowserReloadMiddleware",
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -135,15 +148,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 # local
-# STATIC_URL = 'static/'
-# STATICFILES_DIRS = [
-#     BASE_DIR / "static",
-# ]
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
-# #Media files local
+#Media files local
 
-# MEDIA_URL = 'media/'
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 STORAGES = {
     
@@ -168,12 +181,19 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Expires when browser closes
 SESSION_COOKIE_AGE = 3600 * 3  # Session expires in 1*3 hour (seconds)
 
 # Cookie settings
-SESSION_COOKIE_SECURE = True  # Use HTTPS for session cookies
+SESSION_COOKIE_SECURE = False  # Use HTTPS for session cookies
 SESSION_SAVE_EVERY_REQUEST = True  # Save session data on every request
 
-AWS_ACCESS_KEY_ID = ''
-AWS_SECRET_ACCESS_KEY = ''
-
+# aws stuff
+AWS_ACCESS_KEY_ID = '' 
+AWS_SECRET_ACCESS_KEY = '' 
 AWS_STORAGE_BUCKET_NAME = 'docprojbucket'
-AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+AWS_S3_REGION_NAME = 'ap-southeast-1'
+AWS_DEFAULT_ACL = None
 AWS_S3_FILE_OVERWRITE = False
+
+
+# CSRF_TRUSTED_ORIGINS = [
+#     'http://13.213.52.70',
+#     'localhost'
+# ]

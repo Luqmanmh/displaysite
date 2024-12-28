@@ -2,45 +2,158 @@
 {% load static %}
 {% block css %}
 <style>
-    .top {
-        display: flex;
-        justify-content: space-between;
+    td {
+        border: 0;
+        height: 3rem;
+    }
+
+    .popform {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border: 3px solid #f1f1f1;
+        z-index: 6;
+        text-align: center;
+        border-radius: 1rem;
+        padding: 2rem 3rem;
+        background-color: white;
+    }
+
+    .popform.active {
+        display: block;
+    }
+
+    .btn_cancel {
+        background-color: transparent;
+        color: black;
+        margin-bottom: .5rem;
+        text-align: right;
+        border: none;
     }
 </style>
 {% endblock %}
 {% block title %}patients detail{% endblock title %}
 {% block content %}
-<div class="opts" style="width: 100%;">
+<div class="opts overflow-y-auto h-full" style="width: 100%;">
     <div class="botopts" style="width: auto; min-height: 30rem; width: 95%; margin: 2rem auto;">
-        <div class="top">
-            <div class="topleft";">
-                <h2>Patients Detail</h2>
-                <h5>Name: {{patient.full_name}}</h5>
-                <h5>Updated On: {{patient.newest_update}}</h5>
-                <button><a href="//{{phone}}" target="_blank">Contact</a></button>
+        <div class="shadow-md w-auto min-h-[30rem] rounded-lg border-2 border-gray-200 text-xl">
+            <div class="m-4">
+                <p class="text-4xl border-b-2 border-b-gray-300 pb-4">Patient Detail</p>
+
+                <table class="table-auto">
+                    <tr>
+                        <td class="!w-[8rem]">Name:</td>
+                        <td>{{patient.full_name}}</td>
+                        <td class="text-right w-[45rem] text-sm">
+                            <button type="button"
+                                class="patientform hover:bg-white hover:!text-blue-600 bg-blue-600 p-1 rounded-md text-white font-semibold"
+                                data-target="#patientform">Edit</button>
+                            <button type="button"
+                                class="deletebox hover:bg-white hover:!text-red-600 bg-red-600 p-1 rounded-md text-white font-semibold"
+                                data-target="#deletebox">Delete</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="!w-[8rem]">Updated On:</td>
+                        <td>{{patient.newest_update}}</td>
+                        <td class="text-right"></td>
+                    </tr>
+                    <tr>
+                        <td class="!w-[8rem]">
+                            <div class="block rounded-full bg-green-500 w-8 h-8 text-center group relative">
+                                <a href="//{{phone}}" target="_blank" class="mx-auto text-white">
+                                    <i class="fa-brands fa-whatsapp"></i>
+                                </a>
+                                <div
+                                    class="absolute left-0 mt-1 p-0.5 bg-gray-200 text-sm -z-20 transition-all duration-300 group-hover:z-0 rounded-md w-[11rem]">
+                                    contact through whatsapp
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
             </div>
-            <div class="topright" style="color: maroon; text-align: center; margin: 1rem auto;">
-            {% if patient.critical_con == 1 %}
-            <h2><i class="fa-solid fa-triangle-exclamation"></i></h2>
-            <p>Critical</p>
-            {% endif %}    
+
+            <div class="graph">
+                <div id="graph1" style="overflow-y: auto;"></div>
             </div>
-            
         </div>
-        <div class="graph">
-            <div id="graph1" style="overflow-x: auto; overflow-y: auto;"></div>
+        <div class="botl">
+
+            <div id="deletebox" class="deletebox popform">
+                <div class="top flex text-center justify-center relative">
+                    <p>Are you sure to delete patient {{patient.full_name}}?</p>
+                    <br>
+                    <button type="button" class="btn_cancel absolute -end-6 -top-4" data-target="#deletebox">
+                        <i class="fa-solid fa-x"></i>
+                    </button>
+                </div>
+                <br>
+                <div class="boxmid">
+                    <a href="{% url 'deletepat' patid %}"><button class="hover:bg-white hover:!text-red-600 bg-red-600 px-2 py-1 rounded-md text-white font-semibold">Yes</button></a>
+                </div>
+
+            </div>
+
+            <div class="popform" id="patientform">
+                <div class="top flex text-center justify-center relative">
+                    <p>Edit {{patient.full_name}}'s data</p>
+                    <br>
+                    <button type="button" class="btn_cancel absolute -end-3 -top-4" data-target="#patientform">
+                        <i class="fa-solid fa-x"></i>
+                    </button>
+                </div>
+                <br>
+                <form action="{% url 'editpatient' patid %}" method="POST" class="form-container"
+                    enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="text-left">
+                        <label for="patname" class="text-left text-sm">Patient Name</label><br>
+                        <input type="text" name="patname" id="patname" value="{{patient.full_name}}">
+                        <br><br>
+                        <label for="patnum" class="text-left text-sm">Patient Number</label><br>
+                        <input type="tel" name="patnum" id="patnum" value="{{patient.phone_num}}">
+                    </div>
+                    <br>
+                    <input type="submit"
+                        class="hover:bg-white hover:!text-blue-600 bg-blue-600 p-1 rounded-md text-white font-semibold">
+                </form>
+            </div>
         </div>
     </div>
+</div>
 
 </div>
 {% endblock content %}
 
 {% block script %}
 <script>
-    /* eslint-disable no-undef */
+    const btns = document.querySelectorAll("[data-target]");
+    const cls_btns = document.querySelectorAll(".btn_cancel");
+    const overlay = document.getElementById("overlay");
+
+    btns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+            document.querySelector(btn.dataset.target).classList.add("active");
+            if (overlay.className === "overlay") {
+                overlay.className += "active";
+            }
+        });
+    });
+
+    cls_btns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+            document.querySelector(btn.dataset.target).classList.remove("active");
+            overlay.className = "overlay";
+        });
+    })
+
+
+    // graph
     const ekg_volt = {{ ekgvolt | safe}};
     const ekg_times = {{ ekgtimes | safe}};
-
 
     var trace1 = {
         x: ekg_times,
@@ -49,7 +162,6 @@
     };
 
     const ekgLayout = {
-        title: 'EKG Data',
         xaxis: { title: 'Measurement Index' },
         yaxis: { title: 'Voltage (mV)' }
     };
